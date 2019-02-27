@@ -36,8 +36,8 @@ RUN mkdir -p temp tmp/cache tmp/delayed_pids data public/data/upload
 # we are able to do the bundle install earlier on which means it is cached more often.
 RUN chown -R app:app .
 
-# Remove initializer accessing database
-RUN rm config/initializers/smtp.rb
+# Rewrite initializer to avoid accessing database
+ADD defaults/initializers/smtp.rb /home/app/cypress/config/initializers/smtp.rb
 
 # Precompile assets
 RUN rake assets:precompile RAILS_ENV=production
