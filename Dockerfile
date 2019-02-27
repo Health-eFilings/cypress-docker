@@ -30,7 +30,7 @@ RUN su app -c 'bundle install --without development test'
 
 # If the tmp directory doesn't exist then the app will not be able to run.
 # By creating it here it will get chowned correctly by the next declaration.
-RUN mkdir -p tmp public/data
+RUN mkdir -p temp tmp/cache tmp/delayed_pids data public/data/upload
 
 # This line is a duplicate however it is done to significantly speed up testing. With this line twice
 # we are able to do the bundle install earlier on which means it is cached more often.
@@ -63,4 +63,3 @@ RUN if [ $WORKER_COUNT -gt 1 ]; then \
     fi
 
 EXPOSE 3000
-
