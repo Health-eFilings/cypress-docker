@@ -59,7 +59,7 @@ RUN git clone https://github.com/projectcypress/cypress.git /home/app/cypress
 
 WORKDIR /home/app/cypress
 
-RUN git checkout -b v4.0.2 v4.0.2
+RUN git checkout -b v4.0.4 v4.0.4
 
 RUN chown -R app:app .
 
