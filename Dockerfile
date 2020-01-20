@@ -1,4 +1,4 @@
-FROM phusion/passenger-ruby24:latest
+FROM phusion/passenger-ruby26:1.0.6
 
 # replace shell with bash so we can source files
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
@@ -11,8 +11,8 @@ RUN apt-get update \
     apt-transport-https systemd
 
 # Install ruby 2.6.0 in order to match what we are developing against.
-RUN bash -lc 'rvm install ruby-2.4.5'
-RUN bash -lc 'rvm --default use ruby-2.4.5'
+# RUN bash -lc 'rvm install ruby-2.6.3'
+RUN bash -lc 'rvm --default use ruby-2.6.3'
 RUN gem install bundler
 
 ENV RAILS_ENV production
@@ -59,7 +59,7 @@ RUN git clone https://github.com/projectcypress/cypress.git /home/app/cypress
 
 WORKDIR /home/app/cypress
 
-RUN git checkout -b v4.0.4 v4.0.4
+RUN git checkout -b v5.2.0 v5.2.0
 
 RUN chown -R app:app .
 
@@ -76,9 +76,6 @@ RUN chown -R app:app .
 # Rewrite initializer to avoid accessing database
 ADD defaults/initializers/smtp.rb /home/app/cypress/config/initializers/smtp.rb
 
-# Precompile assets
-RUN rake assets:precompile RAILS_ENV=production
-
 # Clonse, install and execute js-ecqm-engine
 RUN git clone -b master https://github.com/projectcypress/js-ecqm-engine.git /home/app/js-ecqm-engine
 RUN yarn install --cwd /home/app/js-ecqm-engine
@@ -87,9 +84,6 @@ RUN yarn install --cwd /home/app/js-ecqm-engine
 RUN mkdir /etc/service/js-ecqm-engine
 COPY services/js-ecqm-engine.sh /etc/service/js-ecqm-engine/run
 RUN chmod 755 /etc/service/js-ecqm-engine/run
-
-# Remove logs
-RUN rm log/*.log
 
 RUN mkdir /etc/service/unicorn
 RUN cp docker_unicorn_start.sh /etc/service/unicorn/run
