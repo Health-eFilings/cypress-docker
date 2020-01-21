@@ -76,6 +76,16 @@ RUN chown -R app:app .
 # Rewrite initializer to avoid accessing database
 ADD defaults/initializers/smtp.rb /home/app/cypress/config/initializers/smtp.rb
 
+# Precompile assets requires mongodb running for this reason next instrucitons
+# install mongodb-server then precompile assets and remove the mongodb server
+# so final image does not have it
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4B7C549A058F8B6B
+RUN echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-4.2.list
+RUN apt-get update && apt-get install -y mongodb-server
+RUN mkdir -p /data/db
+RUN mongod --fork --logpath /var/log/mongod.log && rake assets:precompile RAILS_ENV=production
+RUN apt-get remove -y mongodb-server
+
 # Clonse, install and execute js-ecqm-engine
 RUN git clone -b master https://github.com/projectcypress/js-ecqm-engine.git /home/app/js-ecqm-engine
 RUN yarn install --cwd /home/app/js-ecqm-engine
