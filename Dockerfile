@@ -103,6 +103,8 @@ RUN mkdir /etc/service/cypress_delayed_job_1
 RUN cp docker_delayed_job.sh /etc/service/cypress_delayed_job_1/run
 RUN chmod 755 /etc/service/cypress_delayed_job_1/run
 
+RUN chown -R app:app /home/app/cypress
+
 # Setup other workers based on first worker. This makes it where tweaking the number of workers
 # just requires changing this WORKER_COUNT. Unfortunately does not allow tweaking after build is completed.
 ARG WORKER_COUNT=4
