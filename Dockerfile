@@ -59,7 +59,7 @@ RUN git clone https://github.com/projectcypress/cypress.git /home/app/cypress
 
 WORKDIR /home/app/cypress
 
-RUN git checkout -b v5.2.0 v5.2.0
+RUN git checkout -b v5.4.1 v5.4.1
 
 RUN chown -R app:app .
 
@@ -76,15 +76,9 @@ RUN chown -R app:app .
 # Rewrite initializer to avoid accessing database
 ADD defaults/initializers/smtp.rb /home/app/cypress/config/initializers/smtp.rb
 
-# Precompile assets requires mongodb running for this reason next instrucitons
-# install mongodb-server then precompile assets and remove the mongodb server
-# so final image does not have it
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4B7C549A058F8B6B
-RUN echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-4.2.list
-RUN apt-get update && apt-get install -y mongodb-server
-RUN mkdir -p /data/db
-RUN mongod --fork --logpath /var/log/mongod.log && rake assets:precompile RAILS_ENV=production
-RUN apt-get remove -y mongodb-server
+# DISABLE_DB disables an initializer that requires the DB to run, so we can precompile in the Docker build phase
+# SECRET_KEY_BASE sets a dummy secret key, so that the precompiler (which doesn't need the secret key for anything) can run
+RUN RAILS_ENV=production DISABLE_DB=true bundle exec rake assets:precompile
 
 # Clonse, install and execute js-ecqm-engine
 RUN git clone -b master https://github.com/projectcypress/js-ecqm-engine.git /home/app/js-ecqm-engine
