@@ -55,11 +55,11 @@ RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources
 RUN apt-get update && apt-get install --no-install-recommends yarn
 
 # Clone repo
-RUN git clone https://github.com/projectcypress/cypress.git /home/app/cypress
+RUN git clone https://github.com/Health-eFilings/cypress.git /home/app/cypress
 
 WORKDIR /home/app/cypress
 
-RUN git checkout -b v5.4.1 v5.4.1
+RUN git checkout add-cancancan-constraint
 
 RUN chown -R app:app .
 
