@@ -1,0 +1,48 @@
+version: '3'
+services:
+  cypress:
+    build:
+      context: .
+    volumes:
+      - cypress-vol:/home/app/cypress/public/data
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGO_PORT_27017_TCP_ADDR=mongo
+      - MONGODB_HOST=mongo
+      - MONGO_PORT_27017_TCP_PORT=27017
+      - DEVISE_SECRET_KEY=baff21530baf4952b0581fa3339c1416bfa689d39dafb5f40395d515fd451a15ccde4763d5a6fe42b885bd8944ef711a51ba87d305207666cf8d1b5d8cb40236
+      - SECRET_KEY_BASE=e79092af209146fbb823328378ca3503179ce27c5960fc554cc065b8adf92cb7bcf21c198f126bc3959bf2487dda938ebc1bf1cd77602bb3f62d96420fba07bf
+      - CQM_EXECUTION_SERVICE_HOST=cqm-execution-service
+    networks:
+      - cypress-net
+    depends_on:
+      - rabbitmq
+      - cqm-execution-service
+      - mongo
+  rabbitmq:
+    image: "rabbitmq:3.7.12-alpine"
+    networks:
+      - cypress-net
+    ports:
+      - "5672:5672"
+  cqm-execution-service:
+    image: "tacoma/cqm-execution-service:cypress_v5"
+    ports:
+      - "8081:8081"
+  mongo:
+    image: "healthefilings/hef-mongodb:latest"
+    volumes:
+      - /data/db
+      - ./mongo:/etc/mongo
+    command: bash -c "mongod -f /etc/mongod.conf"
+    networks:
+      - cypress-net
+    ports:
+      - "27017:27017" 
+networks:
+  cypress-net:
+
+volumes:
+  cypress-vol:
+
